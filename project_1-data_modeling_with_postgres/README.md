@@ -1,9 +1,7 @@
-# Title
-Data Modeling with Postgres
+# Project 1: Data modeling with Postgres
 
 ### Introduction
-A startup called Sparkify wants to analyze the data they've been collecting on songs and user activity on their new music streaming app. The analytics team is particularly interested in understanding what songs users are listening to. Currently, they don't have an easy way to query their data, which resides in a directory of JSON logs on user activity on the app, as well as a directory with JSON metadata on the songs in their app.  
-We will create a database schema and ETL pipeline for this analysis.
+This **Udacity Data Engineering nanodegree** project creates a postgres database `sparkifydb` for a music app, *Sparkify*. The purpose of the database is to model song and log datasets (originaly stored in JSON format) with a star schema optimised for queries on song play analysis.
 
 
 ### Project Description

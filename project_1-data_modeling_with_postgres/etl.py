@@ -4,8 +4,9 @@ import psycopg2
 import pandas as pd
 from sql_queries import *
 
-"""
-    This procedure processes a song file whose filepath has been provided as an arugment.
+def process_song_file(cur, filepath):
+    """
+    This procedure processes a song file whose filepath has been provided as an argument.
     It extracts the song information in order to store it into the songs table.
     Then it extracts the artist information in order to store it into the artists table.
 
@@ -14,8 +15,6 @@ from sql_queries import *
     * filepath the file path to the song file
     """
 
-
-def process_song_file(cur, filepath):
     # open song file
     df = pd.read_json(filepath, lines=True)
 
@@ -29,18 +28,18 @@ def process_song_file(cur, filepath):
     cur.execute(artist_table_insert, artist_data)
 
 
-"""This procedure processes a log file whose filepath has been provided as an argument. It extracts the song start 
-time information, transforms it and then store it into the time table. Then it extracts the users information in 
-order to store it into the users table. Finally it extracts information from songs table, artists table and original 
-log file to store it into the songplays table. 
+def process_log_file(cur, filepath):
+    """
+    This procedure processes a log file whose filepath has been provided as an argument. It extracts the song start
+    time information, transforms it and then store it into the time table. Then it extracts the users information in
+    order to store it into the users table. Finally it extracts information from songs table, artists table and original
+    log file to store it into the songplays table.
 
     INPUTS:
     * cur the cursor variable
     * filepath the file path to the song file
     """
 
-
-def process_log_file(cur, filepath):
     # open log file
     df = pd.read_json(filepath, lines=True)
 
@@ -82,24 +81,24 @@ def process_log_file(cur, filepath):
 
         # insert songplay record
         songplay_data = (
-            index, row.ts, row.userId, row.level, songid, artistid, row.sessionId, row.location, row.userAgent)
+            row.ts, row.userId, row.level, songid, artistid, row.sessionId, row.location, row.userAgent)
         cur.execute(songplay_table_insert, songplay_data)
 
 
-"""Processing one file at a time and losding data into corresponding tables
+def process_data(cur, conn, filepath, func):
+    """
+    Processing one file at a time and losding data into corresponding tables
 
-    This procedure processes a song or log file whose filepath has been provided as an argument at a time by calling 
-    corresponding functions. 
+    This procedure processes a song or log file whose filepath has been provided as an argument at a time by calling
+    corresponding functions.
 
     INPUTS:
     * cur the cursor variable
     * conn the database connection variable
     * filepath the file path to the song file
     * func the func variable which can be either process_song_file or process_log_file
-"""
+    """
 
-
-def process_data(cur, conn, filepath, func):
     # get all files matching extension from directory
     all_files = []
     for root, dirs, files in os.walk(filepath):
