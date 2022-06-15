@@ -87,7 +87,7 @@ def process_log_file(cur, filepath):
 
 def process_data(cur, conn, filepath, func):
     """
-    Processing one file at a time and losding data into corresponding tables
+    Processing one file at a time and loading data into corresponding tables
 
     This procedure processes a song or log file whose filepath has been provided as an argument at a time by calling
     corresponding functions.
