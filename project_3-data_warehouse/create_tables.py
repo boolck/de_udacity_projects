@@ -1,8 +1,9 @@
 import configparser
 import psycopg2
-from sql_queries import create_table_queries,drop_table_queries
+from sql_queries import create_table_queries, drop_table_queries
 
-def drop_tables(cur,conn):
+
+def drop_tables(cur, conn):
     """
     This procedure drops the tables in scope of this project.
     INPUTS:
@@ -13,7 +14,8 @@ def drop_tables(cur,conn):
         cur.execute(query)
         conn.commit()
 
-def create_tables(cur,conn):
+
+def create_tables(cur, conn):
     """
     This procedure creates the tables in scope of this project.
     INPUTS:
@@ -23,6 +25,7 @@ def create_tables(cur,conn):
     for query in create_table_queries:
         cur.execute(query)
         conn.commit()
+
 
 def main():
     config = configparser.ConfigParser()
@@ -35,6 +38,7 @@ def main():
     create_tables(cur, conn)
 
     conn.close()
+
 
 if __name__ == "__main__":
     main()

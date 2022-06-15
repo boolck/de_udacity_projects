@@ -11,8 +11,7 @@ A star schema is suitable for this application since de normalization is easy, q
 ## Prerequisite
 A Redshift cluster should be  created using AWS console
 
-## Installation
-
+And installation of required modules by running 
 ```bash
 $ init.sh
 ```
