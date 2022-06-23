@@ -109,35 +109,30 @@ time_table_create = ("""
 """)
 
 # STAGING TABLE - Log Data
-staging_events_copy = ("""
-    copy staging_events from {log_data}
-    credentials 'aws_iam_role={role_arn}'
-    region {region} 
-    format as JSON {log_json_path};
-""").format(
-    log_data=config['S3']['LOG_DATA'],
-    role_arn=config['IAM_ROLE']['ARN'],
-    region=config['CLUSTER']['REGION'],
-    log_json_path=config['S3']['LOG_JSON_PATH']
-)
+staging_events_copy = (f"""
+    COPY staging_events 
+    FROM 's3://udacity-dend/log_data'
+    CREDENTIALS
+    'aws_access_key_id={config['IAM_ROLE']['ACCESS_KEY_ID']};aws_secret_access_key={config['IAM_ROLE']['SECRET_ACCESS']}'
+    FORMAT as json 's3://udacity-dend/log_json_path.json'
+    REGION 'us-west-2'
+""")
 
 # STAGING TABLE - Songs Data
-staging_songs_copy = ("""
-    copy staging_songs from {song_data}
-    credentials 'aws_iam_role={role_arn}'
-    region {region} 
-    format as JSON 'auto';
-""").format(
-    song_data=config['S3']['SONG_DATA'],
-    role_arn=config['IAM_ROLE']['ARN'],
-    region=config['CLUSTER']['REGION']
-)
+staging_songs_copy = (f"""
+    copy staging_songs 
+    from 's3://udacity-dend/song_data/A/A/A'
+    CREDENTIALS
+    'aws_access_key_id={config['IAM_ROLE']['ACCESS_KEY_ID']};aws_secret_access_key={config['IAM_ROLE']['SECRET_ACCESS']}'
+    FORMAT as json 'auto'
+    REGION 'us-west-2'
+""")
 
 # FINAL TABLES
 songplay_table_insert = ("""
     INSERT INTO songplays (start_time, user_id, level, song_id, artist_id, session_id, location, user_agent)
     SELECT DISTINCT
-        se.ts AS start_time,
+        (TIMESTAMP 'epoch' + ts/1000 * INTERVAL '1 Second ') AS start_time,
         se.userId AS user_id,
         se.level AS level,
         ss.song_id AS song_id,
@@ -202,6 +197,6 @@ create_table_queries = [staging_events_table_create, staging_songs_table_create,
                         artist_table_create, time_table_create, songplay_table_create]
 drop_table_queries = [staging_events_table_drop, staging_songs_table_drop, songplay_table_drop, user_table_drop,
                       song_table_drop, artist_table_drop, time_table_drop]
-copy_table_queries = [staging_events_copy, staging_songs_copy]
+copy_table_queries = [staging_songs_copy,staging_events_copy]
 insert_table_queries = [songplay_table_insert, user_table_insert, song_table_insert, artist_table_insert,
                         time_table_insert]
