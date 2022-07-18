@@ -7,7 +7,7 @@ from operators import (StageToRedshiftOperator, LoadFactOperator,
 
 default_args = {
     'owner': 'boolanik',
-    'start_date': datetime.datetime.now(),
+    'start_date': datetime(2022, 7, 15),
     'email_on_retry': False,
     'retries': 3,
     'retry_delay': timedelta(minutes=5),
