@@ -40,3 +40,4 @@ class LoadDimensionOperator(BaseOperator):
         )
         self.log.info(f"Executing {formatted_sql} ...")
         redshift.run(formatted_sql)
+        
