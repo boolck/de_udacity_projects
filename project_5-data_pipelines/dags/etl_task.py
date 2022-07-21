@@ -11,18 +11,18 @@ default_args = {
     'email_on_retry': False,
     'retries': 3,
     'retry_delay': timedelta(minutes=5),
-    'catchup': False,
-    'depends_on_past': False,
-    'schedule_interval': '@hourly'
+    'depends_on_past': False
 }
 
 dag = DAG(
     'etl_task',
     default_args=default_args,
-    description='Data Pipelines with Airflow'
+    description='Data Pipelines with Airflow',
+    schedule_interval='@hourly',
+    catchup=False
 )
 
-start_operator = DummyOperator(task_id='Begin_execution',  dag=dag)
+start_operator = DummyOperator(task_id='Begin_execution', dag=dag)
 
 stage_events_to_redshift = StageToRedshiftOperator(
     task_id="stage_events",
@@ -31,7 +31,7 @@ stage_events_to_redshift = StageToRedshiftOperator(
     table="staging_events",
     s3_bucket='udacity-dend',
     s3_key="log_data/",
-    extra_params="format as json 's3://udacity-dend/log_json_path.json'",
+    extra_params="format json 's3://udacity-dend/log_json_path.json'",
     dag=dag
 )
 
@@ -41,7 +41,7 @@ stage_songs_to_redshift = StageToRedshiftOperator(
     table="staging_songs",
     s3_bucket='udacity-dend',
     s3_key="song_data",
-    extra_params="json 'auto' compupdate off region 'us-west-2'",
+    extra_params="format json 'auto'",
     task_id='Stage_songs',
     dag=dag
 )
@@ -89,11 +89,20 @@ load_time_dimension_table = LoadDimensionOperator(
 run_quality_checks = DataQualityOperator(
     task_id='run_data_quality_checks',
     redshift_conn_id="redshift",
-    table="time",
+    dq_checks=[
+        {'check_sql': 'SELECT COUNT(*) FROM public.songplays WHERE userid IS NULL', 'expected_result': 0},
+        {'check_sql': 'SELECT COUNT(*) FROM public.artists WHERE name IS NULL', 'expected_result': 0},
+        {'check_sql': 'SELECT COUNT(*) FROM public.songs WHERE title IS NULL', 'expected_result': 0},
+        {'check_sql': 'SELECT COUNT(*) FROM public.users WHERE first_name IS NULL', 'expected_result': 0},
+        {'check_sql': 'SELECT COUNT(*) FROM public."time" WHERE weekday IS NULL', 'expected_result': 0},
+        {
+            'check_sql': 'SELECT COUNT(*) FROM public.songplays sp LEFT OUTER JOIN public.users u ON u.userid = sp.userid WHERE u.userid IS NULL',
+            'expected_result': 0}
+    ],
     dag=dag
 )
 
-end_operator = DummyOperator(task_id='Stop_execution',  dag=dag)
+end_operator = DummyOperator(task_id='Stop_execution', dag=dag)
 
 start_operator >> stage_events_to_redshift
 start_operator >> stage_songs_to_redshift
