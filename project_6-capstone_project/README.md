@@ -1,4 +1,4 @@
-[# Project 6: Udacity Data Engineering Nanodegree Capstone Project
+# Project 6: Udacity Data Engineering Nanodegree Capstone Project
 
 #### Project Summary
 
